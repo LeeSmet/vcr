@@ -1,0 +1,77 @@
+# entities
+type: entity
+name: recipientName
+automatically_extensible: yes
+values:
+  - [me, myself, I]
+  - Kristof
+  - Lee
+  - Jan
+  - Sabrina
+
+---
+type: entity
+name: tftChain
+automatically_extensible: no
+matching_strictness: 0.8
+values:
+  - [stellar-mainnet, stellar mainnet, stellar]
+  - [stellar-testnet, stellar testnet]
+  - [TFChain-mainnet, TFChain mainnet, TFT mainnet]
+  - [TFChain-testnet, TFChain testnet, TFT testnet]
+  - [TFChain-qanet, TFChain qanet, TFT qanet]
+  - [TFChain-devnet, TFChain devnet, TFT devnet]
+
+---
+type: entity
+name: tftAmount
+automatically_extensible: yes
+matching_strictness: 0.8
+values:
+  - 80 TFT
+  - seventeen TFT
+  - 5 threefold tokens
+  - 17000 Threefold Tokens
+  - 465 tokens
+
+---
+type: entity
+name: text
+automatically_extensible: yes
+matching_strictness: 0.01
+values:
+  - Some rather plain text
+  - Hi friend. I hope this message finds you well. There is an important event that I would like you to attend. Details regarding the time and place will follow. Kind regards
+  - The car is in the garage, you'll have it back next week
+
+# intents
+---
+type: intent
+name: transferTft
+slots:
+  - name: recipient
+    entity: recipientName
+  - name: amount
+    entity: tftAmount
+  - name: chain
+    entity: tftChain
+utterances:
+  - Hi, I would like to transfer [amount](100 TFT) to [recipient](Kristof)
+  - Send [amount](fifty threefold tokens) on [chain](stellar) to [recipient](Sabrina)
+  - Move [amount](all) of my tokens on [chain](tfchain mainnet) to [recipient](Lee)
+  - I'd like to pay [amount](17 TFT) to [recipient](Dylan)
+  - Give [recipient](Jan) [amount](525 tokens) on [chain](stellar)
+
+---
+type: intent
+name: sendMessage
+slots:
+  - name: recipient
+    entity: recipientName
+  - name: content
+    entity: text
+utterances:
+  - "Send the following message to [recipient](myself): [content](This is a message sent through a bot by myself to myself. It is primarily meant to see if the NLU engine can detect content.)"
+  - Message [recipient](Jan) to tell him [content](The airconditioning unit in the datacenter broke down last night, and needs to be replaced urgently.)
+  - Inform [recipient](Dylan) that [content](the steak was delicous.)
+  - Convey that [content](I will be attending the pizza party) to [receiver](Peter).
