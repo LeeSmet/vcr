@@ -17,7 +17,8 @@ try:
         with m as source: audio = r.listen(source)
         print("Captured input")
         try:
-            value = r.recognize_whisper(audio)
+            # We just care about english for now, also use the small dataset instead of the base, which requires about 2GB of ram
+            value = r.recognize_whisper(audio, model="small.en", language="english")
             print("Recognized input:\r\n{}".format(value))
         except sr.UnknownValueError:
             print("I did not understand what you are saying")
