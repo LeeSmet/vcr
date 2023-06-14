@@ -11,6 +11,8 @@ m = sr.Microphone()
 try:
     print("Calibrating microphone")
     with m as source: r.adjust_for_ambient_noise(source)
+    if r.energy_threshold < 300:
+        r.energy_threshold = 300
     print("Set minimum energy treshold to {}".format(r.energy_threshold))
     while True:
         print("Say something")
