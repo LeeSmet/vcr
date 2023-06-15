@@ -81,7 +81,7 @@ tensorflow-estimator==2.12.0
 tensorflow-io-gcs-filesystem==0.32.0
 termcolor==2.3.0
 tiktoken==0.3.3
-torch==2.0.1
+torch==2.0.1+cpu
 tqdm==4.65.0
 triton==2.0.0
 typing_extensions==4.6.3
