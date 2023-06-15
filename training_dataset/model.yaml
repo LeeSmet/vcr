@@ -1,6 +1,7 @@
 # entities
 type: entity
 name: recipientName
+matching_strictness: 0.95
 automatically_extensible: yes
 values:
   - [me, myself, I]
@@ -29,7 +30,7 @@ automatically_extensible: yes
 matching_strictness: 0.8
 values:
   - 80 TFT
-  - seventeen TFT
+  - 17 TFT
   - 5 threefold tokens
   - 17000 Threefold Tokens
   - 465 tokens
@@ -38,11 +39,71 @@ values:
 type: entity
 name: text
 automatically_extensible: yes
-matching_strictness: 0.01
+matching_strictness: 0.001
 values:
   - Some rather plain text
   - Hi friend. I hope this message finds you well. There is an important event that I would like you to attend. Details regarding the time and place will follow. Kind regards
   - The car is in the garage, you'll have it back next week
+
+---
+type: entity
+name: cpu
+automatically_extensible: yes
+matching_strictness: 0.95
+values:
+  - 1 Core
+  - 2 CPU
+  - 16 VCores
+  - 8 processor cores
+  - 8 virtual cores
+
+---
+type: entity
+name: datasize
+automatically_extensible: yes
+matching_strictness: 0.95
+values:
+  - 512 MB
+  - 8 GB
+  - 16 gigabyte
+  - 1 TB
+  - 0.5 terrabyte
+  - 768 megabyte
+
+---
+type: entity
+name: VMimage
+automatically_extensible: true
+matching_strictness: 0.95
+values:
+  - Ubuntu 22.04
+  - Ubuntu 20.04
+  - Ubuntu 23.10
+  - Nextcloud
+  - Owncloud
+  - Taiga
+  - presearch
+  - gitea
+
+---
+type: entity
+name: nodeID
+automatically_extensible: true
+values:
+  - node 17
+  - node 59
+  - node ID 695
+  - node 88
+
+---
+type: entity
+name: farmID 
+automatically_extensible: true
+values:
+  - farm 17
+  - farm 59
+  - farm ID 695
+  - farm 88
 
 # intents
 ---
@@ -57,10 +118,11 @@ slots:
     entity: tftChain
 utterances:
   - Hi, I would like to transfer [amount](100 TFT) to [recipient](Kristof)
-  - Send [amount](fifty threefold tokens) on [chain](stellar) to [recipient](Sabrina)
+  - Send [amount](50 threefold tokens) on [chain](stellar) to [recipient](Sabrina)
   - Move [amount](all) of my tokens on [chain](tfchain mainnet) to [recipient](Lee)
   - I'd like to pay [amount](17 TFT) to [recipient](Dylan)
   - Give [recipient](Jan) [amount](525 tokens) on [chain](stellar)
+  - Please donate [amount](1725 threefold tokens) on [chain](TFT testnet) to [recipient](Lars)
 
 ---
 type: intent
@@ -75,3 +137,26 @@ utterances:
   - Message [recipient](Jan) to tell him [content](The airconditioning unit in the datacenter broke down last night, and needs to be replaced urgently.)
   - Inform [recipient](Dylan) that [content](the steak was delicous.)
   - Convey that [content](I will be attending the pizza party) to [receiver](Peter).
+
+---
+type: intent
+name: provisionVM
+slots:
+  - name: cpu
+    entity: cpu
+  - name: ram
+    entity: datasize
+  - name: disk
+    entity: datasize
+  - name: image
+    entity: VMimage
+  - name: location
+    entity: snips/ country
+  - name: nodeID
+    entity: nodeID
+  - name: farmID
+    entity: farmID
+utterances:
+  - Give me a VM with [cpu](2 cores) and [ram](8 GB) of RAM, a [disk](1 TB) disk, running [image](Ubuntu 22.04). It must be located in [location](Belgium).
+  - Deploy a virtual machine on [nodeID](node 1) with an [image](owncloud) image on a [disk](500 gigabyte) drive, with [cpu](4 cores) and [ram](16 gigabyte) of RAM. 
+  - Provision a node with [cpu](4 virtual cores) and [ram](16 gigs) of ram. Make it a [image](taiga) on a [disk](1 terra) disk.
