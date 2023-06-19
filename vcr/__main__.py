@@ -59,9 +59,9 @@ def parse_intent(intentMeta):
     intent = None
     match intentMeta['intent']['intentName']:
         case 'provisionVM':
-            intent = VMProvision(intentMeta['intent']['slots'])
-        case 'transferTFT':
-            intent = TftTransfer(intentMeta['intent']['slots'])
+            intent = VMProvision(intentMeta['slots'])
+        case 'transferTft':
+            intent = TftTransfer(intentMeta['slots'])
     return intent
 
 # Class representing a TFT transfer intent
@@ -70,15 +70,15 @@ class TftTransfer():
     amount = None
     chain = "stellar-mainnet"
 
-    def __init__(self, slots: list[Any]) -> None:
+    def __init__(self, slots: list[dict[str,Any]]) -> None:
         for slot in slots:
-            match slot.slotName:
+            match slot['slotName']:
                 case 'recipient':
-                    self.recipient = slot.value.value
+                    self.recipient = slot['value']['value']
                 case 'amount':
-                    self.amount = _parse_tft_amount(slot.value.value)
+                    self.amount = _parse_tft_amount(slot['value']['value'])
                 case 'chain':
-                    self.chain = slot.value.value
+                    self.chain = slot['value']['value']
 
     def __str__(self) -> str:
         return "Transfer {} TFT to {} on chain {}".format(self.amount, self.recipient, self.chain)
@@ -96,21 +96,21 @@ class VMProvision():
     def __init__(self, slots: list[Any]) -> None:
 
         for slot in slots:
-            match slot.slotName:
+            match slot['slotName']:
                 case 'cpu':
-                    self.cpu = _parse_cpu_amount(slot.value.value)
+                    self.cpu = _parse_cpu_amount(slot['value']['value'])
                 case 'ram':
-                    self.ram = _parse_datasize(slot.value.value)
+                    self.ram = _parse_datasize(slot['value']['value'])
                 case 'disk':
-                    self.disk = _parse_datasize(slot.value.value)
+                    self.disk = _parse_datasize(slot['value']['value'])
                 case 'image':
-                    self.image = slot.value.value
+                    self.image = slot['value']['value']
                 case 'location':
-                    self.location = slot.value.value
+                    self.location = slot['value']['value']
                 case 'nodeID':
-                    self.nodeID = _parse_nodeid(slot.value.value)
+                    self.nodeID = _parse_nodeid(slot['value']['value'])
                 case 'farmID':
-                    self.farmID = _parse_farmid(slot.value.value)
+                    self.farmID = _parse_farmid(slot['value']['value'])
 
     def __str__(self) -> str:
         if self.location is not None:
