@@ -5,7 +5,24 @@ from snips_nlu.dataset import Dataset
 import speech_recognition as sr
 from snips_nlu import SnipsNLUEngine
 from snips_nlu.default_configs import CONFIG_EN
-from typing import Any
+from typing import Any, Union
+from jsonrpc2pyclient.rpcclient import RPCClient
+from websockets.sync.client import connect
+
+class RPCWSClient(RPCClient):
+    """A JSON-RPC WS Client."""
+
+    def __init__(self, url: str):
+        self._cl = connect(url)
+        super(RPCWSClient, self).__init__()
+
+    def disconnect(self):
+        """Close the underlying websocket connection"""
+        self._cl.close()
+
+    def _send_and_get_json(self, request_json: str) -> Union[bytes, str]:
+        self._cl.send(request_json)
+        return self._cl.recv()
 
 def main():
     for index, name in enumerate(sr.Microphone.list_microphone_names()):
