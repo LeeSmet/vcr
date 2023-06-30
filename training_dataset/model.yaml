@@ -78,12 +78,8 @@ matching_strictness: 0.95
 values:
   - Ubuntu 22.04
   - Ubuntu 20.04
-  - Ubuntu 23.10
-  - Nextcloud
   - Owncloud
-  - Taiga
   - presearch
-  - gitea
 
 ---
 type: entity
