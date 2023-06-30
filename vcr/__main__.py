@@ -8,6 +8,7 @@ from snips_nlu.default_configs import CONFIG_EN
 from typing import Any, Union
 from jsonrpc2pyclient.rpcclient import RPCClient
 from websockets.sync.client import connect
+import json
 
 class RPCWSClient(RPCClient):
     """A JSON-RPC WS Client."""
@@ -141,6 +142,13 @@ class VMProvision():
     nodeID = None
     farmID = None
 
+    _image_path_map = {
+        "Ubuntu 22.04": "https://hub.grid.tf/tf-official-vms/ubuntu-22.04-lts.flist",
+        "Ubuntu 20.04": "https://hub.grid.tf/tf-official-vms/ubuntu-20.04-lts.flist",
+        "Owncloud" :"https://hub.grid.tf/tf-official-apps/owncloud-10.9.1.flist",
+        "presearch" :"https://hub.grid.tf/tf-official-apps/presearch-v2.3.flist",
+    }
+
     def __init__(self, slots: list[Any]) -> None:
 
         for slot in slots:
@@ -171,6 +179,11 @@ class VMProvision():
             loc = "in unknown location"
 
         return "deploying VM running {} with {} VCPU, {} RAM, on a {} disk {}".format(self.image, self.cpu, self.ram, self.disk, loc)
+
+    def image_url(self):
+        if self.image is None:
+            return None
+        return self._image_path_map[self.image] if self.image in self._image_path_map else None
 
 def _parse_cpu_amount(input: str):
     for p in input.split(' '):
@@ -226,6 +239,36 @@ def _metric_from_str(input: str):
         return "gb"
     if input.lower() in ["tb", "terabyte", "tera"]:
         return "tb"
+
+class W3CClient():
+    def __init__(self, url: str):
+        self._cl = RPCWSClient(url)
+
+    def deploy_vm(self, vmp: VMProvision):
+        name = "vcr.poc"
+        network = {"ip_range": "10.99.0.0/16", "add_wireguard_access": True}
+        machines = {
+                "name": "vm1",
+                "node_id": vmp.nodeID if vmp.nodeID is not None else 0,
+                "farm_id": vmp.farmID if vmp.farmID is not None else 0,
+                "flist": vmp.image_url(),
+                "entrypoint": "",
+                "public_ip": True,
+                "public_ip6": True,
+                "planetary": True,
+                "cpu": vmp.cpu,
+                "memory": vmp.ram.mb(),
+                "disks": {
+                    "size": vmp.disk.gb(),
+                    "mountpoint": "/",
+                },
+                "env_vars": {"SSH_KEY": "TODO: Load ssh key"}, # TODO
+                "description": "",
+        }
+        metadata = ""
+        description = ""
+        ret = cl.call("tfgrid.MachinesDeploy", [{"name":name, "network":network,"machines":machines,"metadata":metadata, "description":description}])
+        return json.loads(ret)
 
 if __name__ == "__main__":
     main()
