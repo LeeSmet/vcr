@@ -100,6 +100,37 @@ class TftTransfer():
     def __str__(self) -> str:
         return "Transfer {} TFT to {} on chain {}".format(self.amount, self.recipient, self.chain)
 
+class DataSize():
+    value = None
+    def __init__(self, val: int, metric: str) -> None:
+        match metric.lower().strip(' '):
+            case "mb":
+                self.value = val * 1_000_000
+            case "gb":
+                self.value = val * 1_000_000_000
+            case "tb":
+                self.value = val * 1_000_000_000_000
+
+    def __str__(self) -> str:
+        if self.value is None:
+            return "Unknown size"
+        if self.value >= 1_000_000_000_000:
+            return "{} TB".format(self.value / 1_000_000_000_000)
+        elif self.value >= 1_000_000_000:
+            return "{} GB".format(self.value / 1_000_000_000)
+        else:
+            return "{} MB".format(self.value / 1_000_000)
+
+    def mb(self):
+        if self.value is None:
+            return 0
+        return self.value / 1_000_000
+
+    def gb(self):
+        if self.value is None:
+            return 0
+        return self.value / 1_000_000_000
+
 # Class representing a VM Provision intent
 class VMProvision():
     cpu = None
@@ -140,29 +171,6 @@ class VMProvision():
             loc = "in unknown location"
 
         return "deploying VM running {} with {} VCPU, {} RAM, on a {} disk {}".format(self.image, self.cpu, self.ram, self.disk, loc)
-
-class DataSize():
-    value = None
-    def __init__(self, val: int, metric: str) -> None:
-        match metric.lower().strip(' '):
-            case "mb":
-                self.value = val * 1_000_000
-            case "gb":
-                self.value = val * 1_000_000_000
-            case "tb":
-                self.value = val * 1_000_000_000_000
-
-    def __str__(self) -> str:
-        if self.value is None:
-            return "Unknown size"
-        if self.value >= 1_000_000_000_000:
-            return "{} TB".format(self.value / 1_000_000_000_000)
-        elif self.value >= 1_000_000_000:
-            return "{} GB".format(self.value / 1_000_000_000)
-        else:
-            return "{} MB".format(self.value / 1_000_000)
-
-
 
 def _parse_cpu_amount(input: str):
     for p in input.split(' '):
