@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals, print_function
 from snips_nlu.dataset import Dataset
+import sounddevice as _
 import speech_recognition as sr
 from snips_nlu import SnipsNLUEngine
 from snips_nlu.default_configs import CONFIG_EN
