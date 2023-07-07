@@ -119,6 +119,7 @@ utterances:
   - I'd like to pay [amount](17 TFT) to [recipient](Dylan)
   - Give [recipient](Jan) [amount](525 tokens) on [chain](stellar)
   - Please donate [amount](1725 threefold tokens) on [chain](TFT testnet) to [recipient](Lars)
+  - On [chain](tfchain-devnet) transfer [amount](50 TFT) to [recipient](Sabrina)
 
 ---
 type: intent

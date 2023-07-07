@@ -11,6 +11,9 @@ from jsonrpc2pyclient.rpcclient import RPCClient
 from websockets.sync.client import connect
 import json
 
+_tfchain_mnemonic = ''
+_stellar_secret = '' #TODO
+
 class RPCWSClient(RPCClient):
     """A JSON-RPC WS Client."""
 
@@ -27,6 +30,8 @@ class RPCWSClient(RPCClient):
         return self._cl.recv()
 
 def main():
+    cl = W3CClient("ws://localhost:8080")
+
     for index, name in enumerate(sr.Microphone.list_microphone_names()):
         print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
 
@@ -55,6 +60,15 @@ def main():
                 print(parsing)
                 intent = parse_intent(parsing)
                 print("Extract intent {}".format(intent))
+                if intent is None:
+                    print("could not parse an intent")
+                    continue
+                try:
+                    cl.handle(intent)
+                    pass
+                except Exception as e:
+                    print('got exception {}'.format(e))
+                    continue
             except sr.UnknownValueError:
                 print("I did not understand what you are saying")
     except KeyboardInterrupt:
@@ -85,7 +99,7 @@ def parse_intent(intentMeta):
 
 # Class representing a TFT transfer intent
 class TftTransfer():
-    recipient = None
+    recipient = '' 
     amount = None
     chain = "stellar-mainnet"
 
@@ -151,7 +165,6 @@ class VMProvision():
     }
 
     def __init__(self, slots: list[Any]) -> None:
-
         for slot in slots:
             match slot['slotName']:
                 case 'cpu':
@@ -242,8 +255,32 @@ def _metric_from_str(input: str):
         return "tb"
 
 class W3CClient():
+    _tfchain_address_book = {
+        'Lee': '5HYRkLCPT6vVDDQPKrWgonBBagDuV5aneEarxR8Pr3LsvErq',
+        'Kristof': '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y', # Charlie well known account
+        'Sabrina': '5HGjWAeFDfFCWPsjFQdVV2Msvz2XtMktvgocEZcCj68kUMaw', # Eve well known account
+        'Jan': '5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy', # Dave well known account
+    }
+
+    _stellar_address_book = {
+        'Lee': '',
+        'Kristof': '', 
+        'Sabrina': '', 
+        'Jan': '', 
+    }
+
     def __init__(self, url: str):
         self._cl = RPCWSClient(url)
+
+    def handle(self, intent: VMProvision|TftTransfer):
+        if isinstance(intent, TftTransfer):
+            self.transfer_tft(intent)
+            return
+        if isinstance(intent, VMProvision):
+            self.deploy_vm(intent)
+            return
+        raise Exception('unrecognized intent')
+
 
     def deploy_vm(self, vmp: VMProvision):
         name = "vcr.poc"
@@ -268,8 +305,46 @@ class W3CClient():
         }
         metadata = ""
         description = ""
-        ret = cl.call("tfgrid.MachinesDeploy", [{"name":name, "network":network,"machines":machines,"metadata":metadata, "description":description}])
+        ret = self._cl.call("tfgrid.MachinesDeploy", [{"name":name, "network":network,"machines":machines,"metadata":metadata, "description":description}])
         return json.loads(ret)
+
+    def _load_grid_client(self):
+        # TODO
+        pass
+
+    _stellar_networks = {"stellar-mainnet":  "public", "stellar-testnet": "testnet"}
+    _tfchain_networks = {"TFChain-mainnet": "main", "TFChain-testnet": "test", "TFChain-qanet": "qa", "TFChain-devnet": "dev"}
+
+    def transfer_tft(self, transfer: TftTransfer):
+        if transfer.chain in self._stellar_networks:
+            self._connect_stellar(self._stellar_networks[transfer.chain])
+            self._transfer_stellar(transfer)
+            return
+        if transfer.chain in self._tfchain_networks:
+            self._connect_tfchain(self._tfchain_networks[transfer.chain])
+            self._transfer_tfchain(transfer)
+            return
+        raise Exception('unknown network')
+
+    def _transfer_stellar(self, transfer: TftTransfer):
+        if not transfer.recipient in self._stellar_address_book:
+            raise Exception('unkown recipient')
+        if transfer.amount is None:
+            raise Exception('undefined transfer amount')
+        return self._cl.call('stellar.Transfer', [{'amount': '{}'.format(transfer.amount), 'destination': self._stellar_address_book[transfer.recipient], 'memo': ''}])
+
+    def _connect_stellar(self, network: str):
+        self._cl.call('stellar.Load', [{'secret': _stellar_secret, 'network': network}])
+        
+    def _transfer_tfchain(self, transfer: TftTransfer):
+        if not transfer.recipient in self._tfchain_address_book:
+            raise Exception('unkown recipient')
+        if transfer.amount is None:
+            raise Exception('undefined transfer amount')
+        return self._cl.call('tfchain.Transfer', [{'amount': transfer.amount * 10_000_000, 'destination': self._tfchain_address_book[transfer.recipient]}])
+
+    def _connect_tfchain(self, network: str):
+        self._cl.call('tfchain.Load', [{'network': network, 'mnemonic': _tfchain_mnemonic}])
 
 if __name__ == "__main__":
     main()
