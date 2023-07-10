@@ -18,10 +18,10 @@ matching_strictness: 0.8
 values:
   - [stellar-mainnet, stellar mainnet, stellar]
   - [stellar-testnet, stellar testnet]
-  - [TFChain-mainnet, TFChain mainnet, TFT mainnet]
-  - [TFChain-testnet, TFChain testnet, TFT testnet]
-  - [TFChain-qanet, TFChain qanet, TFT qanet]
-  - [TFChain-devnet, TFChain devnet, TFT devnet]
+  - [TFChain-mainnet, TFChain mainnet, TFT mainnet, tf chain main net, tfchain main net, tft main net]
+  - [TFChain-testnet, TFChain testnet, TFT testnet, tf chain test net, tfchain test net, tft test net]
+  - [TFChain-qanet, TFChain qanet, TFT qanet, tf chain qa net, tfchain qa net, tft qa net]
+  - [TFChain-devnet, TFChain devnet, TFT devnet, tf chain dev net, tfchain dev net, tft dev net]
 
 ---
 type: entity
