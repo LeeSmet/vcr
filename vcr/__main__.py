@@ -283,6 +283,7 @@ class W3CClient():
 
 
     def deploy_vm(self, vmp: VMProvision):
+        self._load_grid_client("dev") # Hardcode deploy to devnet
         name = "vcr.poc"
         network = {"ip_range": "10.99.0.0/16", "add_wireguard_access": True}
         machines = {
@@ -308,9 +309,8 @@ class W3CClient():
         ret = self._cl.call("tfgrid.MachinesDeploy", [{"name":name, "network":network,"machines":machines,"metadata":metadata, "description":description}])
         return json.loads(ret)
 
-    def _load_grid_client(self):
-        # TODO
-        pass
+    def _load_grid_client(self, network: str):
+        self._cl.call('tfgrid.Load', [{'network': network, 'mnemonic': _tfchain_mnemonic}])
 
     _stellar_networks = {"stellar-mainnet":  "public", "stellar-testnet": "testnet"}
     _tfchain_networks = {"TFChain-mainnet": "main", "TFChain-testnet": "test", "TFChain-qanet": "qa", "TFChain-devnet": "dev"}
