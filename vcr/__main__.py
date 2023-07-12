@@ -10,6 +10,7 @@ from typing import Any, Union
 from jsonrpc2pyclient.rpcclient import RPCClient
 from websockets.sync.client import connect
 import json
+import click
 
 _tfchain_mnemonic = ''
 _stellar_secret = '' #TODO
@@ -29,50 +30,42 @@ class RPCWSClient(RPCClient):
         self._cl.send(request_json)
         return self._cl.recv()
 
-def main():
-    cl = W3CClient("ws://localhost:8080")
+class InputEngine():
+    pass
 
-    for index, name in enumerate(sr.Microphone.list_microphone_names()):
-        print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
+class CliInput():
+    def __init__(self):
+        pass
 
-    nlu_engine = _setup_engine()
+    def get_input(self):
+        return input('>>>')
 
-    # Setup audio input and recognizer
-    r = sr.Recognizer()
-    m = sr.Microphone()
+class MicrophoneInput():
+    def __init__(self):
+        for index, name in enumerate(sr.Microphone.list_microphone_names()):
+            print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
+        # Setup audio input and recognizer
+        self._r = sr.Recognizer()
+        self._m = sr.Microphone()
 
-    try:
         print("Calibrating microphone")
-        with m as source: r.adjust_for_ambient_noise(source)
-        print("Set minimum energy treshold to {}".format(r.energy_threshold))
-        if r.energy_threshold < 300:
-            r.energy_threshold = 300
-            print("Set minimum energy treshold to {}".format(r.energy_threshold))
-        while True:
-            print("Say something, energy treshold {}".format(r.energy_threshold))
-            with m as source: audio = r.listen(source)
-            print("Captured input")
+        with self._m as source: self._r.adjust_for_ambient_noise(source)
+        print("Set minimum energy treshold to {}".format(self._r.energy_threshold))
+        if self._r.energy_threshold < 300:
+            self._r.energy_threshold = 300
+            print("Set minimum energy treshold to {}".format(self._r.energy_threshold))
+
+    def get_input(self):
+        while(True):
             try:
+                with self._m as source: audio = self._r.listen(source)
+                print('captured input')
                 # We just care about english for now, also use the small dataset instead of the base, which requires about 2GB of ram
-                value = r.recognize_whisper(audio, model="small.en", language="english")
-                print("Recognized input:\r\n{}".format(value))
-                parsing = _extract_intent(value, nlu_engine)
-                print(parsing)
-                intent = parse_intent(parsing)
-                print("Extract intent {}".format(intent))
-                if intent is None:
-                    print("could not parse an intent")
-                    continue
-                try:
-                    cl.handle(intent)
-                    pass
-                except Exception as e:
-                    print('got exception {}'.format(e))
-                    continue
+                return self._r.recognize_whisper(audio, model='small.en', language='english')
             except sr.UnknownValueError:
                 print("I did not understand what you are saying")
-    except KeyboardInterrupt:
-        pass
+
+
 
 def _setup_engine():
     # Load NLU dataset and fit in model
@@ -345,6 +338,41 @@ class W3CClient():
 
     def _connect_tfchain(self, network: str):
         self._cl.call('tfchain.Load', [{'network': network, 'mnemonic': _tfchain_mnemonic}])
+
+@click.command()
+@click.option('--cli', is_flag=True)
+def main(cli=False):
+    cl = W3CClient("ws://localhost:8080")
+
+    nlu_engine = _setup_engine()
+
+    if cli:
+        input_engine = CliInput()
+    else:
+        input_engine = MicrophoneInput()
+
+    try:
+        while True:
+            try:
+                value = input_engine.get_input()
+                print("Recognized input:\r\n{}".format(value))
+                parsing = _extract_intent(value, nlu_engine)
+                print(parsing)
+                intent = parse_intent(parsing)
+                print("Extract intent {}".format(intent))
+                if intent is None:
+                    print("could not parse an intent")
+                    continue
+                try:
+                    cl.handle(intent)
+                    pass
+                except Exception as e:
+                    print('got exception {}'.format(e))
+                    continue
+            except sr.UnknownValueError:
+                print("I did not understand what you are saying")
+    except KeyboardInterrupt:
+        pass
 
 if __name__ == "__main__":
     main()
