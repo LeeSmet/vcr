@@ -18,10 +18,10 @@ matching_strictness: 0.8
 values:
   - [stellar-mainnet, stellar mainnet, stellar]
   - [stellar-testnet, stellar testnet]
-  - [TFChain-mainnet, TFChain mainnet, TFT mainnet, tf chain main net, tfchain main net, tft main net]
-  - [TFChain-testnet, TFChain testnet, TFT testnet, tf chain test net, tfchain test net, tft test net]
-  - [TFChain-qanet, TFChain qanet, TFT qanet, tf chain qa net, tfchain qa net, tft qa net]
-  - [TFChain-devnet, TFChain devnet, TFT devnet, tf chain dev net, tfchain dev net, tft dev net]
+  - [TFChain-mainnet, TFChain mainnet, TFT mainnet, tf chain main net, tfchain main net, tft main net, TF Chain MainNet]
+  - [TFChain-testnet, TFChain testnet, TFT testnet, tf chain test net, tfchain test net, tft test net, TF Chain TestNet]
+  - [TFChain-qanet, TFChain qanet, TFT qanet, tf chain qa net, tfchain qa net, tft qa net, TF Chain QANet]
+  - [TFChain-devnet, TFChain devnet, TFT devnet, tf chain dev net, tfchain dev net, tft dev net, TF Chain DevNet]
 
 ---
 type: entity
@@ -114,9 +114,11 @@ slots:
     entity: tftChain
 utterances:
   - Hi, I would like to transfer [amount](100 TFT) to [recipient](Kristof)
+  - Hi, I would like to transfer [amount](100 TFT) to [recipient](Kristof) on [chain](TF Chain MainNet)
   - Send [amount](50 threefold tokens) on [chain](stellar) to [recipient](Sabrina)
   - Move [amount](all) of my tokens on [chain](tfchain mainnet) to [recipient](Lee)
   - I'd like to pay [amount](17 TFT) to [recipient](Dylan)
+  - I'd like to pay [amount](17 TFT) on [chain](tft dev net) to [recipient](Dylan)
   - Give [recipient](Jan) [amount](525 tokens) on [chain](stellar)
   - Please donate [amount](1725 threefold tokens) on [chain](TFT testnet) to [recipient](Lars)
   - On [chain](tfchain-devnet) transfer [amount](50 TFT) to [recipient](Sabrina)
