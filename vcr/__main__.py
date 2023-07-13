@@ -14,6 +14,7 @@ import click
 
 _tfchain_mnemonic = ''
 _stellar_secret = '' #TODO
+_ssh_key = ''
 
 class RPCWSClient(RPCClient):
     """A JSON-RPC WS Client."""
@@ -132,12 +133,12 @@ class DataSize():
 
     def mb(self):
         if self.value is None:
-            return 0
+            raise Exception('memory not set')
         return self.value / 1_000_000
 
     def gb(self):
         if self.value is None:
-            return 0
+            raise Exception('memory not set')
         return self.value / 1_000_000_000
 
 # Class representing a VM Provision intent
@@ -276,8 +277,8 @@ class W3CClient():
 
 
     def deploy_vm(self, vmp: VMProvision):
-        self._load_grid_client("dev") # Hardcode deploy to devnet
-        name = "vcr.poc"
+        self._load_grid_client("qa") # Hardcode deploy to qanet
+        name = "vcr_poc"
         network = {"ip_range": "10.99.0.0/16", "add_wireguard_access": True}
         machines = {
                 "name": "vm1",
@@ -289,18 +290,15 @@ class W3CClient():
                 "public_ip6": True,
                 "planetary": True,
                 "cpu": vmp.cpu,
-                "memory": vmp.ram.mb(),
-                "disks": {
-                    "size": vmp.disk.gb(),
+                "memory": int(vmp.ram.mb()),
+                "disks": [{
+                    "size": int(vmp.disk.gb()),
                     "mountpoint": "/",
-                },
-                "env_vars": {"SSH_KEY": "TODO: Load ssh key"}, # TODO
+                }],
+                "env_vars": {"SSH_KEY": _ssh_key},
                 "description": "",
         }
-        metadata = ""
-        description = ""
-        ret = self._cl.call("tfgrid.MachinesDeploy", [{"name":name, "network":network,"machines":machines,"metadata":metadata, "description":description}])
-        return json.loads(ret)
+        return self._cl.call("tfgrid.MachinesDeploy", [{"name":name, "network":network,"machines":[machines]}])
 
     def _load_grid_client(self, network: str):
         self._cl.call('tfgrid.Load', [{'network': network, 'mnemonic': _tfchain_mnemonic}])
@@ -364,8 +362,9 @@ def main(cli=False):
                     print("could not parse an intent")
                     continue
                 try:
-                    cl.handle(intent)
-                    pass
+                    ret = cl.handle(intent)
+                    if ret is not None:
+                        print(ret)
                 except Exception as e:
                     print('got exception {}'.format(e))
                     continue
