@@ -9,7 +9,6 @@ from snips_nlu.default_configs import CONFIG_EN
 from typing import Any, Union
 from jsonrpc2pyclient.rpcclient import RPCClient
 from websockets.sync.client import connect
-import json
 import click
 
 _tfchain_mnemonic = ''
