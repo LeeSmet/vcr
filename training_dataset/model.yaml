@@ -158,4 +158,5 @@ slots:
 utterances:
   - Give me a VM with [cpu](2 cores) and [ram](8 GB) of RAM, a [disk](1 TB) disk, running [image](Ubuntu 22.04). It must be located in [location](Belgium).
   - Deploy a virtual machine on [nodeID](node 1) with an [image](owncloud) image on a [disk](500 gigabyte) drive, with [cpu](4 cores) and [ram](16 gigabyte) of RAM. 
-  - rrovision a node on [farmID](farm 14) with [cpu](4 virtual cores) and [ram](16 gigs) of ram. Make it a [image](taiga) on a [disk](1 terra) disk.
+  - Provision a node on [farmID](farm 14) with [cpu](4 virtual cores) and [ram](16 gigs) of ram. Make it a [image](taiga) on a [disk](1 terra) disk.
+  - Deploy a VM on [nodeID](node 15) with the [image](Ubuntu 22.04) image using [cpu](1 core) and [ram](1 GB) of memory, with a disk size of [disk](25 GB)
