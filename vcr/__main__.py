@@ -30,9 +30,6 @@ class RPCWSClient(RPCClient):
         self._cl.send(request_json)
         return self._cl.recv()
 
-class InputEngine():
-    pass
-
 class CliInput():
     def __init__(self):
         pass
@@ -42,8 +39,6 @@ class CliInput():
 
 class MicrophoneInput():
     def __init__(self):
-        for index, name in enumerate(sr.Microphone.list_microphone_names()):
-            print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
         # Setup audio input and recognizer
         self._r = sr.Recognizer()
         self._m = sr.Microphone()
@@ -70,7 +65,6 @@ class MicrophoneInput():
 def _setup_engine():
     # Load NLU dataset and fit in model
     dataset = Dataset.from_yaml_files("en", ["training_dataset/model.yaml"])
-    print("Loaded dataset:\r\n\t{}".format(dataset.json))
     nlu_engine = SnipsNLUEngine(config=CONFIG_EN)
     nlu_engine = nlu_engine.fit(dataset)
     return nlu_engine
