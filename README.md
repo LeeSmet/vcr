@@ -64,4 +64,4 @@ Running the code is done by
 python3 vcr/__main__.py
 ```
 
-in the root of the repository
+in the root of the repository. Alternatively the `--cli` flag can be used, in which case the program will run in a chat like mode
